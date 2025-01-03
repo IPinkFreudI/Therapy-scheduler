@@ -72,7 +72,8 @@ app.post('/voice', async (req, res) => {
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 10,
+            speechTimeout: 1,
+            timeout: 10
         });
         
         gather.say({ voice: 'alice' }, 
@@ -83,7 +84,8 @@ app.post('/voice', async (req, res) => {
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 10,
+            speechTimeout: 1,
+            timeout: 10
         }).say({ voice: 'alice' }, "Hey, are you still there?");
         
         // If no response after second 10 seconds
@@ -91,7 +93,8 @@ app.post('/voice', async (req, res) => {
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 10,
+            speechTimeout: 1,
+            timeout: 10
         }).say({ voice: 'alice' }, "I can't hear you if you're talking.");
         
         // Final message before hanging up
@@ -157,7 +160,8 @@ app.post('/handle-response', async (req, res) => {
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 10,
+            speechTimeout: 1,
+            timeout: 10
         });
         
         gather.say({ voice: 'alice' }, aiResponse);
@@ -167,7 +171,8 @@ app.post('/handle-response', async (req, res) => {
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 10,
+            speechTimeout: 1,
+            timeout: 10
         }).say({ voice: 'alice' }, "Hey, are you still there?");
         
         // If no response after second 10 seconds
@@ -175,7 +180,8 @@ app.post('/handle-response', async (req, res) => {
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 10,
+            speechTimeout: 1,
+            timeout: 10
         }).say({ voice: 'alice' }, "I can't hear you if you're talking.");
         
         // Final message before hanging up
