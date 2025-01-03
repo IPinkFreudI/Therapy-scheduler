@@ -72,34 +72,30 @@ app.post('/voice', async (req, res) => {
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 10,  // First 10-second wait
+            speechTimeout: 10,
         });
         
         gather.say({ voice: 'alice' }, 
             "Thanks for calling Heart and Mind Healing. My name is Elly, how can I help you today?");
         
         // If no response after first 10 seconds
-        const gather2 = twiml.gather({
+        twiml.gather({
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 10,  // Second 10-second wait
-        });
-        
-        gather2.say({ voice: 'alice' }, "Hey, are you still there?");
+            speechTimeout: 10,
+        }).say({ voice: 'alice' }, "Hey, are you still there?");
         
         // If no response after second 10 seconds
-        const gather3 = twiml.gather({
+        twiml.gather({
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 10,  // Final 10-second wait
-        });
-        
-        gather3.say({ voice: 'alice' }, "I can't hear you if you're talking.");
+            speechTimeout: 10,
+        }).say({ voice: 'alice' }, "I can't hear you if you're talking.");
         
         // Final message before hanging up
-        twiml.say({ voice: 'alice' }, "I'll need to end the call now. Please call back when you're ready to talk.");
+        twiml.say({ voice: 'alice' }, "Hey, I'm still not hearing you, give us a call back and I'll be happy to help you get an appointment set up.");
         
         res.type('text/xml');
         res.send(twiml.toString());
@@ -135,7 +131,9 @@ app.post('/handle-response', async (req, res) => {
                     content: systemPrompt
                 },
                 ...conversationHistory // Include previous conversation
-            ]
+            ],
+            temperature: 0.7,
+            max_tokens: 150
         });
 
         const aiResponse = completion.choices[0].message.content;
@@ -164,28 +162,24 @@ app.post('/handle-response', async (req, res) => {
         
         gather.say({ voice: 'alice' }, aiResponse);
         
-        // First silence check
-        const gather2 = twiml.gather({
+        // If no response after first 10 seconds
+        twiml.gather({
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
             speechTimeout: 10,
-        });
+        }).say({ voice: 'alice' }, "Hey, are you still there?");
         
-        gather2.say({ voice: 'alice' }, "Hey, are you still there?");
-        
-        // Second silence check
-        const gather3 = twiml.gather({
+        // If no response after second 10 seconds
+        twiml.gather({
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
             speechTimeout: 10,
-        });
-        
-        gather3.say({ voice: 'alice' }, "I can't hear you if you're talking.");
+        }).say({ voice: 'alice' }, "I can't hear you if you're talking.");
         
         // Final message before hanging up
-        twiml.say({ voice: 'alice' }, "I'll need to end the call now. Please call back when you're ready to talk.");
+        twiml.say({ voice: 'alice' }, "Hey, I'm still not hearing you, give us a call back and I'll be happy to help you get an appointment set up.");
         
         res.type('text/xml');
         res.send(twiml.toString());
