@@ -38,18 +38,21 @@ SCHEDULING:
 CONVERSATION STYLE:
 - Be warm and friendly, but professional
 - Use conversational language rather than formal
-- Ask for their name early in scheduling conversations
+- Listen first, then respond appropriately
 - Break down scheduling into natural steps
 - Don't repeatedly mention the business name or location
 
 SCHEDULING FLOW:
 1. When someone wants to schedule:
-   - First ask for their name: "While I get the schedules pulled up, can I get your name?"
+   - First ask for their name: "While I check availability, can I get your name?"
+   - WAIT for their response
    - Then ask if they prefer virtual or in-person
    - Ask about preferred time of day
    - Only provide location details if specifically asked
 
 RESPONSE GUIDELINES:
+- Always wait for the caller's complete response before asking the next question
+- Never combine multiple questions in one response
 - Keep responses conversational and natural
 - Maintain context of the conversation
 - Only mention location when specifically asked
@@ -59,7 +62,7 @@ RESPONSE GUIDELINES:
 Remember to:
 - Keep responses under 50 words
 - Always maintain a warm, helpful tone
-- Follow up each response with a relevant question
+- Ask only one question at a time
 - Stay focused on the current step in the conversation`;
 
 app.post('/voice', async (req, res) => {
@@ -69,11 +72,34 @@ app.post('/voice', async (req, res) => {
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 'auto'
+            speechTimeout: 10,  // First 10-second wait
         });
         
         gather.say({ voice: 'alice' }, 
             "Thanks for calling Heart and Mind Healing. My name is Elly, how can I help you today?");
+        
+        // If no response after first 10 seconds
+        const gather2 = twiml.gather({
+            input: 'speech',
+            action: '/handle-response',
+            language: 'en-US',
+            speechTimeout: 10,  // Second 10-second wait
+        });
+        
+        gather2.say({ voice: 'alice' }, "Hey, are you still there?");
+        
+        // If no response after second 10 seconds
+        const gather3 = twiml.gather({
+            input: 'speech',
+            action: '/handle-response',
+            language: 'en-US',
+            speechTimeout: 10,  // Final 10-second wait
+        });
+        
+        gather3.say({ voice: 'alice' }, "I can't hear you if you're talking.");
+        
+        // Final message before hanging up
+        twiml.say({ voice: 'alice' }, "I'll need to end the call now. Please call back when you're ready to talk.");
         
         res.type('text/xml');
         res.send(twiml.toString());
@@ -133,10 +159,33 @@ app.post('/handle-response', async (req, res) => {
             input: 'speech',
             action: '/handle-response',
             language: 'en-US',
-            speechTimeout: 'auto'
+            speechTimeout: 10,
         });
         
         gather.say({ voice: 'alice' }, aiResponse);
+        
+        // First silence check
+        const gather2 = twiml.gather({
+            input: 'speech',
+            action: '/handle-response',
+            language: 'en-US',
+            speechTimeout: 10,
+        });
+        
+        gather2.say({ voice: 'alice' }, "Hey, are you still there?");
+        
+        // Second silence check
+        const gather3 = twiml.gather({
+            input: 'speech',
+            action: '/handle-response',
+            language: 'en-US',
+            speechTimeout: 10,
+        });
+        
+        gather3.say({ voice: 'alice' }, "I can't hear you if you're talking.");
+        
+        // Final message before hanging up
+        twiml.say({ voice: 'alice' }, "I'll need to end the call now. Please call back when you're ready to talk.");
         
         res.type('text/xml');
         res.send(twiml.toString());
